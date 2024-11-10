@@ -64,8 +64,10 @@ def get_course_by_name(course_name: str = Query()):
     for i in classes.values():
         if i.course == course_name:
             found_courses.append(i)
+    if len(found_courses) == 0:
+        raise HTTPException(status_code=404, detail="Course was not found")
     return found_courses
-    raise HTTPException(status_code=404, detail="Course was not found")
+    
 
 @app.get("/course/")
 def get_all_courses():
