@@ -1,15 +1,12 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
 import csv
 from typing import Dict
+from middleware.middleware import add_middleware
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"]
-)
+add_middleware(app)
 
 class Course(BaseModel):
     crn: int
@@ -69,6 +66,6 @@ def get_course_by_name(course_name: str = Query()):
     return found_courses
     
 
-@app.get("/course/")
+@app.get("/all_courses/")
 def get_all_courses():
     return list(classes.values())
