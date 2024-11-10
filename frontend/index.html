@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNU CourseFinder</title>
+</head>
+<body>
+    
+    <header>
+        <h1>CNU CourseFinder</h1>
+    </header>
+
+    <div>
+        <h2>Upload CSV</h2>
+        <input type="file" id="classes" accept=".csv">
+        <button onClick="uploadCSV()">Upload CSV</button>
+        <p id="uploadStatus"></p>
+    </div>
+
+    <br>
+
+    <div>
+        <h2>Search Courses</h2>
+        <input type="text" id="courseName" placeholder="Enter course name e.g. ACCT 200">
+        <button onclick="searchCourse()">Search</button>
+        <table id="coursesFound" border="1">
+            <thead>
+                <tr>
+                    <th>CRN</th>
+                    <th>Course</th>
+                    <th>Title</th>
+                    <th>Cr. Hours</th>
+                    <th>Area</th>
+                    <th>Type</th>
+                    <th>Days</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Instructor</th>
+                    <th>Seats</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="coursesListed">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
