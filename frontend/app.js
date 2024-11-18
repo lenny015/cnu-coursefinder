@@ -1,5 +1,13 @@
 const API_URL = "http://127.0.0.1:8000";
 
+window.onload = function() {
+    // Clear the search bar
+    document.querySelector('#courseName').value = '';
+    
+    // Clear the file input
+    document.querySelector('#classes').value = '';
+};
+
 async function uploadCSV() {
     const fileInput = document.querySelector('#classes');
     const uploadStatus = document.querySelector('#uploadStatus');
@@ -21,11 +29,17 @@ async function uploadCSV() {
 
         const result = await response.json();
         if (response.ok) {
+            uploadStatus.classList.remove('alert', 'alert-warning', 'alert-danger')
+            uploadStatus.classList.add('alert', 'alert-success')
             uploadStatus.innerHTML = `<p>Upload successful: ${result.Courses_Loaded} courses loaded.</p>`;
         } else {
-            uploadStatus.innerHTML = `<p>Error: ${result.detail}</p>`;
+            uploadStatus.classList.remove('alert', 'alert-success', 'alert-danger');
+            uploadStatus.classList.add('alert', 'alert-warning')
+            uploadStatus.innerHTML = `<p>Error: Upload failed</p>`;
         }
     } catch (error) {
+        uploadStatus.classList.remove('alert', 'alert-success', 'alert-warning');
+        uploadStatus.classList.add('alert', 'alert-danger')
         uploadStatus.innerHTML = `<p>Error: ${error.message}</p>`;
     }
 }
@@ -53,7 +67,18 @@ async function searchCourse() {
                 row.insertCell(8).innerText = course.location;
                 row.insertCell(9).innerText = course.instructor;
                 row.insertCell(10).innerText = course.seats;
-                row.insertCell(11).innerText = course.status;
+
+                const statusCell = row.insertCell(11);
+                statusCell.innerText = course.status;
+                if (course.status.toLowerCase() === "open") {
+                    statusCell.style.backgroundColor = "green";
+                    statusCell.style.fontWeight = "bold";
+                    statusCell.style.color = "white";
+                } else if (course.status.toLowerCase() === "closed") {
+                    statusCell.style.backgroundColor = "red";
+                    statusCell.style.fontWeight = "bold";
+                    statusCell.style.color = "white";
+                } 
             });
         } else {
             row.insertCell(0).innerText = courses.detail || "No courses found with that name.";
