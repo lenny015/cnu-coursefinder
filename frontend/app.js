@@ -30,16 +30,16 @@ async function uploadCSV() {
         const result = await response.json();
         if (response.ok) {
             uploadStatus.classList.remove('alert', 'alert-warning', 'alert-danger')
-            uploadStatus.classList.add('alert', 'alert-success')
+            uploadStatus.classList.add('alert', 'alert-success', 'pb-1', 'p-3', 'my-2', 'px-3')
             uploadStatus.innerHTML = `<p>Upload successful: ${result.Courses_Loaded} courses loaded.</p>`;
         } else {
             uploadStatus.classList.remove('alert', 'alert-success', 'alert-danger');
-            uploadStatus.classList.add('alert', 'alert-warning')
+            uploadStatus.classList.add('alert', 'alert-warning', 'pb-1', 'p-3', 'my-2', 'px-3')
             uploadStatus.innerHTML = `<p>Error: Upload failed</p>`;
         }
     } catch (error) {
         uploadStatus.classList.remove('alert', 'alert-success', 'alert-warning');
-        uploadStatus.classList.add('alert', 'alert-danger')
+        uploadStatus.classList.add('alert', 'alert-danger', 'pb-1', 'p-3', 'my-2', 'px-3')
         uploadStatus.innerHTML = `<p>Error: ${error.message}</p>`;
     }
 }
