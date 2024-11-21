@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import csv
 from typing import Dict
 from middleware.middleware import add_middleware
+from src.data.scraper import scrape_schedules
 
 app = FastAPI()
 
@@ -24,8 +25,37 @@ class Course(BaseModel):
 
 classes: Dict[int, Course] = {}
 
+def startup():
+    print("Beginning scrape")
+    result = scrape_schedules()
+
+    index = 0
+    for i in result:
+        course = Course(
+            crn = int(i[0]),
+            course = i[1],
+            title = i[3],
+            hours = i[4],
+            area = i[5],
+            type_lecture = i[6],
+            days = i[7],
+            time = i[8],
+            location = i[9],
+            instructor = i[10],
+            seats = int(i[11]),
+            status = i[12]
+            )
+        
+        classes[index] = course
+        index += 1
+
+    print("Scrape done")
+
+app.add_event_handler("startup", startup)
+
 @app.post("/upload")
 async def upload_csv(file: UploadFile = File(...)):
+    classes.clear()
     content = await file.read()
     decoded = content.decode("utf-8").splitlines()
 
