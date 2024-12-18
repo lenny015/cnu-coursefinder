@@ -23,6 +23,9 @@ function FilterClassTable({ classes }) {
 }
 
 function SearchBar({filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange}) {
+
+  const[selectValue, setSelectValue] = useState("");
+
   return (
     <form>
       <input
@@ -37,7 +40,13 @@ function SearchBar({filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange})
           onChange={(e) => onOnlyOpenChange(e.target.checked)} />
         {' '}
         Open Courses
+        {' '}
       </label>
+      <select 
+        value={selectValue} 
+        onChange={(e) => setSelectValue(e.target.value)}>
+          <option value="">Select a semester</option>
+      </select>
     </form>
   );
 }
