@@ -38,58 +38,63 @@ def scrape_schedules():
 
     semester_select = html.find('select', {'id': 'semesterlist'})
     options = semester_select.find_all('option')
+    
+    data = dict()
+    
+    for option in options[:2]:
+        semester_value = option['value']
+        print(f"Fetching data from {semester_value}")
 
-    # '202510' is the ID for the Spring 2025 semester, hardcoded for now
-    semester_value = '202510'
+    # # '202510' is the ID for the Spring 2025 semester, hardcoded for now
+    # semester_value = '202510'
 
-    form_data = {
-            '__EVENTTARGET': '',
-            '__EVENTARGUMENT': '',
-            '__VIEWSTATE': viewstate,
-            '__VIEWSTATEGENERATOR': viewstategenerator,
-            '__EVENTVALIDATION': eventvalidation,
-            'semester_list': semester_value,
-            'Interestlist2': 'Any',
-            'CourseNumTextbox': '',
-            'Button1': 'Search'
-    }
+        form_data = {
+                '__EVENTTARGET': '',
+                '__EVENTARGUMENT': '',
+                '__VIEWSTATE': viewstate,
+                '__VIEWSTATEGENERATOR': viewstategenerator,
+                '__EVENTVALIDATION': eventvalidation,
+                'semester_list': semester_value,
+                'Interestlist2': 'Any',
+                'CourseNumTextbox': '',
+                'Button1': 'Search'
+        }
 
-    post_response = session.post(base_url + "socquery.aspx", data=form_data, headers=headers, timeout=15)
-    if post_response.status_code != 200:
-        print(f"Form submission failed: code {post_response.status_code}")
-        print(post_response.text)
-        return
+        post_response = session.post(base_url + "socquery.aspx", data=form_data, headers=headers, timeout=15)
+        if post_response.status_code != 200:
+            print(f"Form submission failed: code {post_response.status_code}")
+            print(post_response.text)
+            return
 
-    time.sleep(1)
+        result_response = session.get(base_url + "socresults.aspx", headers=headers, timeout=15)
 
-    result_response = session.get(base_url + "socresults.aspx", headers=headers, timeout=15)
+        response_soup = BeautifulSoup(result_response.text, 'html.parser')
+        table = response_soup.find('table', {'id': 'GridView1'})
 
-    response_soup = BeautifulSoup(result_response.text, 'html.parser')
-    table = response_soup.find('table', {'id': 'GridView1'})
+        output_data = []
 
-    output_data = []
+        rows = table.find_all('tr')[1:]
 
-    rows = table.find_all('tr')[1:]
+        for row in rows:
+            cells = row.find_all('td')
 
-    for row in rows:
-        cells = row.find_all('td')
+            course_row = [
+                cells[0].text.strip(),          # CRN
+                cells[1].text.strip(),          # Course
+                cells[2].text.strip(),          # Section
+                cells[3].text.strip(),          # Title
+                cells[4].text.strip(),          # Hours
+                cells[6].text.strip(),          # Area
+                cells[7].text.strip(),          # Type
+                cells[8].text.strip(),          # Days
+                cells[9].text.strip(),          # Time
+                cells[10].text.strip(),         # Location
+                cells[11].text.strip(),         # Instructor
+                cells[12].text.strip(),         # Seats
+                cells[13].text.strip(),         # Status
+            ]
 
-        course_row = [
-            cells[0].text.strip(),          # CRN
-            cells[1].text.strip(),          # Course
-            cells[2].text.strip(),          # Section
-            cells[3].text.strip(),          # Title
-            cells[4].text.strip(),          # Hours
-            cells[6].text.strip(),          # Area
-            cells[7].text.strip(),          # Type
-            cells[8].text.strip(),          # Days
-            cells[9].text.strip(),          # Time
-            cells[10].text.strip(),         # Location
-            cells[11].text.strip(),         # Instructor
-            cells[12].text.strip(),         # Seats
-            cells[13].text.strip(),         # Status
-        ]
-
-        output_data.append(course_row)
-
-    return output_data
+            output_data.append(course_row)
+        
+        data[semester_value] = output_data
+    return data
