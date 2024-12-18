@@ -3,50 +3,47 @@ from bs4 import BeautifulSoup
 import time
 
 def scrape_schedules():
-    base_url = "https://navigator.cnu.edu/StudentScheduleofClasses/"
-
-    session = requests.Session()
-
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Referer': 'https://navigator.cnu.edu/StudentScheduleofClasses/socquery.aspx',
-        'Origin': 'https://navigator.cnu.edu',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Sec-Ch-Ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-        'Sec-Ch-Ua-Mobile': '?0',
-        'Sec-Ch-Ua-Platform': '"Windows"',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'same-origin',
-        'Sec-Fetch-User': '?1',
-        'Upgrade-Insecure-Requests': '1',
-        'Priority': 'u=0, i',
-        'Cache-Control': 'max-age=0',
-        'Connection': 'keep-alive'
-    }
-
-    query_response = session.get(base_url + "socquery.aspx", headers=headers, timeout=15)
-
-    html = BeautifulSoup(query_response.text, 'html.parser')
-
-    viewstate = html.find('input', {'name': '__VIEWSTATE'})['value']
-    viewstategenerator = html.find('input', {'name': '__VIEWSTATEGENERATOR'})['value']
-    eventvalidation = html.find('input', {'name': '__EVENTVALIDATION'})['value']
-
-    semester_select = html.find('select', {'id': 'semesterlist'})
-    options = semester_select.find_all('option')
-    
+    semester_ids = get_semester_ids()[0:6]
     data = dict()
     
-    for option in options[:2]:
-        semester_value = option['value']
-        print(f"Fetching data from {semester_value}")
+    for semester in semester_ids:
+        base_url = "https://navigator.cnu.edu/StudentScheduleofClasses/"
 
-    # # '202510' is the ID for the Spring 2025 semester, hardcoded for now
-    # semester_value = '202510'
+        session = requests.Session()
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Referer': 'https://navigator.cnu.edu/StudentScheduleofClasses/socquery.aspx',
+            'Origin': 'https://navigator.cnu.edu',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Sec-Ch-Ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+            'Priority': 'u=0, i',
+            'Cache-Control': 'max-age=0',
+            'Connection': 'keep-alive'
+        }
+
+        query_response = session.get(base_url + "socquery.aspx", headers=headers, timeout=15)
+
+        html = BeautifulSoup(query_response.text, 'html.parser')
+
+        viewstate = html.find('input', {'name': '__VIEWSTATE'})['value']
+        viewstategenerator = html.find('input', {'name': '__VIEWSTATEGENERATOR'})['value']
+        eventvalidation = html.find('input', {'name': '__EVENTVALIDATION'})['value']
+        
+        print(f"Fetching data from {semester}")
+
+        # # '202510' is the ID for the Spring 2025 semester, hardcoded for now
+        # semester_value = '202510'
 
         form_data = {
                 '__EVENTTARGET': '',
@@ -54,7 +51,7 @@ def scrape_schedules():
                 '__VIEWSTATE': viewstate,
                 '__VIEWSTATEGENERATOR': viewstategenerator,
                 '__EVENTVALIDATION': eventvalidation,
-                'semester_list': semester_value,
+                'semesterlist': semester,
                 'Interestlist2': 'Any',
                 'CourseNumTextbox': '',
                 'Button1': 'Search'
@@ -96,5 +93,41 @@ def scrape_schedules():
 
             output_data.append(course_row)
         
-        data[semester_value] = output_data
+        data[semester] = output_data
+        time.sleep(0.5)
     return data
+
+def get_semester_ids():
+    base_url = "https://navigator.cnu.edu/StudentScheduleofClasses/"
+
+    session = requests.Session()
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br, zstd',
+        'Referer': 'https://navigator.cnu.edu/StudentScheduleofClasses/socquery.aspx',
+        'Origin': 'https://navigator.cnu.edu',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Sec-Ch-Ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        'Sec-Ch-Ua-Mobile': '?0',
+        'Sec-Ch-Ua-Platform': '"Windows"',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'Upgrade-Insecure-Requests': '1',
+        'Priority': 'u=0, i',
+        'Cache-Control': 'max-age=0',
+        'Connection': 'keep-alive'
+    }
+
+    query_response = session.get(base_url + "socquery.aspx", headers=headers, timeout=15)
+
+    html = BeautifulSoup(query_response.text, 'html.parser')
+
+    semester_select = html.find('select', {'id': 'semesterlist'})
+    options = semester_select.find_all('option')
+    
+    return [option['value'] for option in options]

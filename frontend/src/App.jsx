@@ -105,7 +105,7 @@ function useFetchData(API_URL) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/all_courses/?semester=202532`); //TODO: Add dropdown menu for each semester query
+        const response = await fetch(`${API_URL}/all_courses/?semester=202500`); //TODO: Add dropdown menu for each semester query
         const courses = await response.json();
 
         if (response.ok && courses.length > 0) {
