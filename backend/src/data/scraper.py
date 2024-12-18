@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import time
 
 def scrape_schedules():
-    semester_ids = get_semester_ids()[0:6]
+    semester_ids = get_semester_ids().keys()
     data = dict()
     
     for semester in semester_ids:
@@ -41,9 +41,6 @@ def scrape_schedules():
         eventvalidation = html.find('input', {'name': '__EVENTVALIDATION'})['value']
         
         print(f"Fetching data from {semester}")
-
-        # # '202510' is the ID for the Spring 2025 semester, hardcoded for now
-        # semester_value = '202510'
 
         form_data = {
                 '__EVENTTARGET': '',
@@ -130,4 +127,9 @@ def get_semester_ids():
     semester_select = html.find('select', {'id': 'semesterlist'})
     options = semester_select.find_all('option')
     
-    return [option['value'] for option in options]
+    ids = {}
+    
+    for option in options[0:6]:
+        ids[option['value']] = option.text
+    
+    return ids

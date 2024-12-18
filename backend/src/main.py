@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import csv
 from typing import Dict
 from middleware.middleware import add_middleware
-from src.data.scraper import scrape_schedules
+from src.data.scraper import scrape_schedules, get_semester_ids
 
 app = FastAPI()
 
@@ -24,14 +24,17 @@ class Course(BaseModel):
     status: str
 
 classes: Dict[str, Dict[str, Course]] = {}
+semesters = dict()
 
 def startup():
     
     global classes
+    global semesters
     classes.clear()
     
     print("Beginning scrape")
     result = scrape_schedules()
+    semesters = get_semester_ids()
     
     for semester, courses in result.items():
         semester_courses = dict()
@@ -112,5 +115,9 @@ def get_all_courses(semester: str = Query()):
     if semester and (semester not in classes):
         raise HTTPException(status_code=404, detail="Semester not found")
     
-    
     return list(classes[semester].values())
+
+@app.get("/semesters/")
+def get_semesters():
+    global semesters
+    return semesters
