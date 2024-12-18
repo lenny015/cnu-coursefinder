@@ -11,7 +11,7 @@ Install backend dependencies:
 
 ```bash
 cd backend
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Install frontend dependencies:
@@ -36,5 +36,5 @@ Backend
 
 ```bash
 cd backend
-uvicorn src.main:app --reload
+python -m uvicorn src.main:app --reload
 ```
