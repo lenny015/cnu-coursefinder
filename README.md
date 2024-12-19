@@ -1,7 +1,7 @@
 ﻿
 # CNU CourseFinder
 
-This app fetches course data from a backend that scrapes [CNU's Schedule of Classes](https://navigator.cnu.edu/StudentScheduleofClasses/) to display and filter through CNU courses dynamically.
+This application scrapes course information from [CNU's Schedule of Classes](https://navigator.cnu.edu/StudentScheduleofClasses/) into a FastAPI backend, displaying and filtering through CNU courses dynamically.
 
 
 
@@ -32,7 +32,7 @@ cd frontend
 npm run dev
 ```
 
-Backend
+Backend:
 
 ```bash
 cd backend
