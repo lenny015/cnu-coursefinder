@@ -3,7 +3,7 @@ import './App.css'
 
 const API_URL = "http://127.0.0.1:8000";
 
-function FilterClassTable({ classes }) {
+function FilterClassTable({ classes , onSemesterChange}) {
   const [filterText, setFilterText] = useState('');
   const [onlyOpen, setOnlyOpen] = useState(false);
 
@@ -13,6 +13,7 @@ function FilterClassTable({ classes }) {
         filterText={filterText}
         onlyOpen={onlyOpen}
         onFilterTextChange={setFilterText}
+        onSemesterChange={onSemesterChange}
         onOnlyOpenChange={setOnlyOpen} />
       <ClassTable
         classes={classes}
@@ -22,9 +23,30 @@ function FilterClassTable({ classes }) {
   )
 }
 
-function SearchBar({filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange}) {
+function SearchBar({filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange, onSemesterChange}) {
 
   const[selectValue, setSelectValue] = useState("");
+  const[semesters, setSemesters] = useState({});
+
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      try {
+        const response = await fetch(`${API_URL}/semesters/`);
+        const data = await response.json();
+        setSemesters(data);
+      } catch (error) {
+        console.error("Error fetching semesters:", error);
+      }
+    };
+    
+    fetchSemesters();
+  }, []);
+
+  const handleSemesterChange = (e) => {
+    const newValue = e.target.value;
+    setSelectValue(newValue);
+    onSemesterChange(newValue);
+  }
 
   return (
     <form>
@@ -44,8 +66,11 @@ function SearchBar({filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange})
       </label>
       <select 
         value={selectValue} 
-        onChange={(e) => setSelectValue(e.target.value)}>
+        onChange={handleSemesterChange}>
           <option value="">Select a semester</option>
+          {Object.entries(semesters).map(([sem_id, name]) => (
+            <option value={sem_id}>{name}</option>
+          ))}
       </select>
     </form>
   );
@@ -107,14 +132,17 @@ function ClassTable({ classes, filterText, onlyOpen }) {
   );
 }
 
-function useFetchData(API_URL) {
+function useFetchData(API_URL, semester) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/all_courses/?semester=202500`); //TODO: Add dropdown menu for each semester query
+        if (!semester) return;
+
+        
+        const response = await fetch(`${API_URL}/all_courses/?semester=${semester}`); //TODO: Add dropdown menu for each semester query
         const courses = await response.json();
 
         if (response.ok && courses.length > 0) {
@@ -126,20 +154,21 @@ function useFetchData(API_URL) {
     };
 
     fetchData();
-  }, [API_URL]);
+  }, [API_URL, semester]);
 
   return {data, error};
 }
 
 
 function App() {
-  const {data, error} = useFetchData(API_URL);
+  const [selectedSemester, setSelectedSemester] = useState("");
+  const {data, error} = useFetchData(API_URL, selectedSemester);
 
   if (error) {
     return <div>Error {error}</div>;
   }
 
-  return <FilterClassTable classes={data} />
+  return <FilterClassTable classes={data} onSemesterChange={setSelectedSemester} />
 }
 
 export default App
