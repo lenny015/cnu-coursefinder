@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup
 import time
 
 def scrape_schedules():
-    semester_ids = get_semester_ids().keys()
+    semesters = get_semester_ids()
+    semester_keys = semesters.keys()
     data = dict()
     
-    for semester in semester_ids:
+    for semester in semester_keys:
         base_url = "https://navigator.cnu.edu/StudentScheduleofClasses/"
 
         session = requests.Session()
@@ -40,7 +41,7 @@ def scrape_schedules():
         viewstategenerator = html.find('input', {'name': '__VIEWSTATEGENERATOR'})['value']
         eventvalidation = html.find('input', {'name': '__EVENTVALIDATION'})['value']
         
-        print(f"Fetching data from {semester}")
+        print(f"Fetching data from {semesters[semester]}")
 
         form_data = {
                 '__EVENTTARGET': '',
