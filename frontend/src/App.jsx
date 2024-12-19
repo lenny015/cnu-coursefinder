@@ -141,8 +141,8 @@ function useFetchData(API_URL, semester) {
       try {
         if (!semester) return;
 
-        
-        const response = await fetch(`${API_URL}/all_courses/?semester=${semester}`); //TODO: Add dropdown menu for each semester query
+
+        const response = await fetch(`${API_URL}/all_courses/?semester=${semester}`);
         const courses = await response.json();
 
         if (response.ok && courses.length > 0) {
