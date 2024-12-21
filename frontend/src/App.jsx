@@ -80,7 +80,7 @@ function SearchBar({ filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange,
         <input
           type="checkbox"
           checked={onlyOpen}
-          className="my-3 ml-1"
+          className="my-2 ml-1"
           onChange={(e) => onOnlyOpenChange(e.target.checked)} />
         Open Courses
       </label>
@@ -92,7 +92,7 @@ function ClassRow({ course }) {
   const status = course.status === 'Open' ? { color: 'green' } : { color: 'red' };
 
   return (
-    <tr>
+    <tr className="border-b border-x border-blue-gray-5 overflow-scroll hover:bg-blue-50">
       <td className="px-4 py-2">{course.crn}</td>
       <td className="px-4 py-2">{course.course}</td>
       <td className="px-4 py-2">{course.title}</td>
@@ -125,20 +125,20 @@ function ClassTable({ classes, filterText, onlyOpen }) {
   });
 
   return (
-    <div className="min-w-full overflow-x-auto">
+    <div className="min-w-full overflow-x-auto rounded-md">
       <table className="w-full">
-        <thead className="sticky top-0">
+        <thead className="sticky top-0 border bg-gray-200">
           <tr className="h-3">
-            <th className="border p-2">CRN</th>
-            <th className="border p-2">Course</th>
-            <th className="border p-2">Title</th>
-            <th className="border p-2">Instructor</th>
-            <th className="border p-2">Credits</th>
-            <th className="border p-2">Time</th>
-            <th className="border p-2">Days</th>
-            <th className="border p-2">Location</th>
-            <th className="border p-2">Seats</th>
-            <th className="border p-2">Status</th>
+            <th className="p-2">CRN</th>
+            <th className="p-2">Course</th>
+            <th className="p-2">Title</th>
+            <th className="p-2">Instructor</th>
+            <th className="p-2">Credits</th>
+            <th className="p-2">Time</th>
+            <th className="p-2">Days</th>
+            <th className="p-2">Location</th>
+            <th className="p-2">Seats</th>
+            <th className="p-2">Status</th>
           </tr>
         </thead>
       <tbody className="overflow-y-auto max-h-96">{rows}</tbody>
