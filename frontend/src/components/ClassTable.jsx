@@ -1,7 +1,7 @@
 import React from 'react';
 import ClassRow from './ClassRow';
 
-function ClassTable({ classes, filterText, onlyOpen }) {
+function ClassTable({ classes, filterText, onlyOpen, onAddCourse }) {
     const rows = [];
   
     classes.forEach((course) => {
@@ -14,7 +14,8 @@ function ClassTable({ classes, filterText, onlyOpen }) {
       rows.push(
         <ClassRow
           key={course.crn}
-          course={course} />
+          course={course}
+          onAddCourse={onAddCourse} />
       );
     });
   
