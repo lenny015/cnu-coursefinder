@@ -89,7 +89,6 @@ function SearchBar({ filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange,
 }
 
 function ClassRow({ course }) {
-  const status = course.status === 'Open' ? { color: 'green' } : { color: 'red' };
 
   return (
     <tr className="border-b border-x border-blue-gray-5 overflow-scroll hover:bg-blue-50">
@@ -102,7 +101,11 @@ function ClassRow({ course }) {
       <td className="px-4 py-2">{course.days}</td>
       <td className="px-4 py-2">{course.location}</td>
       <td className="px-4 py-2">{course.seats}</td>
-      <td className="px-4 py-2" style={status}>{course.status}</td>
+      <td className="px-4 py-2">{course.status === 'Open' ? (
+        <button className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-700">Open</button>
+      ) : (
+        <span style={{color: 'red'}}>{course.status}</span>
+      )}</td>
     </tr>
   );
 }
