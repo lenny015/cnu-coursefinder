@@ -1,8 +1,7 @@
 ﻿
 # CNU CourseFinder
 
-This application scrapes course information from [CNU's Schedule of Classes](https://navigator.cnu.edu/StudentScheduleofClasses/) into a FastAPI backend, displaying and filtering through CNU courses dynamically.
-
+A web app that scrapes course information from [CNU's Schedule of Classes](https://navigator.cnu.edu/StudentScheduleofClasses/) to a FastAPI backend. Uses a React.js frontend to filter courses and create schedules.
 
 
 ## Setup (virtual environment recommended)
