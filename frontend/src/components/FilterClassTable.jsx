@@ -10,8 +10,38 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
 
   const handleCourses = (course) => {
     if (!courses.find((select) => select.crn === course.crn)) {
-      setCourses([...courses, course]);
+      const times = courses.map((c) => c.time);
+
+      console.log(times);
+      if (!validTime(course.time, times)) {
+        alert("Error: Class times overlap in schedule"); //TODO: Make a notification component
+      } else {
+        setCourses([...courses, course]);
+      }
+      
     }
+  }
+
+  function parseTime(time) {
+    if (typeof time !== 'string') {
+      console.error("Invalid time format:", time);
+      return;
+    }
+
+    const [start, end] = time.split("-").map(Number);
+    return {start, end};
+  }
+
+  function validTime(newTime, setTimes) {
+    const {start: newStart, end: newEnd} = parseTime(newTime);
+
+    for (const time of setTimes) {
+      const {start, end} = parseTime(time);
+      if (newStart < end && newEnd > start) {
+        return false;
+      }
+    }
+    return true;
   }
 
   const handleSemesterChange = (semester) => {
