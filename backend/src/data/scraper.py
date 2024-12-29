@@ -130,7 +130,7 @@ def get_semester_ids():
     
     ids = {}
     
-    for option in options[0:6]:
+    for option in options:
         ids[option['value']] = option.text
     
     return ids

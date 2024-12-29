@@ -38,7 +38,7 @@ function SearchBar({ filterText, onlyOpen, onFilterTextChange, onOnlyOpenChange,
         onChange={handleSemesterChange}
         className="w-full p-2 border rounded-md">
         <option value="">Select a semester</option>
-        {Object.entries(semesters).map(([sem_id, name]) => (
+        {Object.entries(semesters).reverse().map(([sem_id, name]) => (
           <option value={sem_id} key={sem_id}>{name}</option>
         ))}
       </select>
