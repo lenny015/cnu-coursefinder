@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import SearchBar from './SearchBar';
 import ClassTable from './ClassTable';
 import CourseSchedule from './CourseSchedule';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
   const [filterText, setFilterText] = useState('');
@@ -12,11 +14,23 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
     if (!courses.find((select) => select.crn === course.crn)) {
       const times = courses.map((c) => c.time);
 
-      console.log(times);
       if (!validTime(course.time, times)) {
-        alert("Error: Class times overlap in schedule"); //TODO: Make a notification component
+        toast.error("Error: Class times overlap in schedule", {
+          position: "bottom-right",
+          autoClose: 3000,
+          closeOnClick: true,
+          theme: "colored",
+          hideProgressBar: true
+        });
       } else {
         setCourses([...courses, course]);
+        toast.success(course.course + " added to schedule", {
+          position: "bottom-right",
+          autoClose: 1500,
+          hideProgressBar: true,
+          closeOnClick: true,
+          theme: "light",
+        });
       }
       
     }
