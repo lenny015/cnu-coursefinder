@@ -36,6 +36,10 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
     }
   }
 
+  const handleDeleteCourse = (crn) => {
+    setCourses(courses.filter(course => course.crn !== crn));
+  }
+
   function parseTime(time) {
     if (typeof time !== 'string') {
       console.error("Invalid time format:", time);
@@ -77,7 +81,8 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
           apiUrl={apiUrl} />
         {courses.length > 0  && (
           <CourseSchedule 
-          courses={courses} />
+          courses={courses}
+          onDeleteCourse={handleDeleteCourse} />
         )}
       </div>
 
