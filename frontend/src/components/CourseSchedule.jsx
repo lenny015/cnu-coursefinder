@@ -1,6 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 function CourseSchedule({courses, onDeleteCourse}) {
+    const [reviewOpen, setReviewOpen] = useState(false);
+
+    const handleReview = () => {
+        setReviewOpen(true);
+    };
+
+    const closeReview = () => {
+        setReviewOpen(false);
+    }
+
     return (
         <div className="mt-8 overflow-x-auto rounded-md">
             <h2 className="text-1xl font-bold mb-2 ml-1">Course Schedule</h2>
@@ -33,6 +43,54 @@ function CourseSchedule({courses, onDeleteCourse}) {
                     ))}
                 </tbody>
             </table>
+            <button 
+                className="mt-3 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-800"
+                onClick={handleReview}>
+                    Review
+            </button>
+
+            {reviewOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-md shadow-md p-4 w-3/4 max-w-4xl">
+                        <h2 className="text-2xl font-bold mb-4">Review Schedule</h2>
+                        <table className="w-full border-collapse border rounded-md border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th>CRN</th>
+                                    <th>Course</th>
+                                    <th>Time</th>
+                                    <th>Days</th>
+                                    <th>Exam Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {courses.map((course) => (
+                                    <tr key={course.crn}>
+                                        <td className="border border-gray-300 px-4 py-2">{course.crn}</td>
+                                        <td className="border border-gray-300 px-4 py-2">{course.course}</td>
+                                        <td className="border border-gray-300 px-4 py-2">{course.time}</td>
+                                        <td className="border border-gray-300 px-4 py-2">{course.days}</td>
+                                        <td className="border border-gray-300 px-4 py-2">TBD</td> 
+                                        {/* TODO: Add exam times */}
+                                    </tr>
+                                
+                                ))}
+                            </tbody>
+                        </table>
+                        <button
+                            className="mt-3 mr-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-800"
+                            onClick={closeReview}>
+                                Close
+                        </button>
+                        <button 
+                            className="mt-3 mx-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-800">
+                                Export to CSV
+                        </button>
+                        {/* TODO: Make CSV export */}
+                    </div>
+                    
+                </div>
+            )}
         </div>
     );
 }
