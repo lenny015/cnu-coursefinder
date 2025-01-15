@@ -1,6 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='\033[95m%(levelname)s:\t %(message)s'
+)
 
 def scrape_schedules():
     semesters = get_semester_ids()
@@ -41,7 +47,7 @@ def scrape_schedules():
         viewstategenerator = html.find('input', {'name': '__VIEWSTATEGENERATOR'})['value']
         eventvalidation = html.find('input', {'name': '__EVENTVALIDATION'})['value']
         
-        print(f"Fetching data from {semesters[semester]}")
+        logging.info(f"Fetching data from {semesters[semester]}")
 
         form_data = {
                 '__EVENTTARGET': '',
@@ -57,8 +63,8 @@ def scrape_schedules():
 
         post_response = session.post(base_url + "socquery.aspx", data=form_data, headers=headers, timeout=15)
         if post_response.status_code != 200:
-            print(f"Form submission failed: code {post_response.status_code}")
-            print(post_response.text)
+            logging.error(f"Form submission failed: code {post_response.status_code}")
+            logging.error(post_response.text)
             return
 
         result_response = session.get(base_url + "socresults.aspx", headers=headers, timeout=15)

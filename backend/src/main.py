@@ -32,7 +32,7 @@ def startup():
     global semesters
     classes.clear()
     
-    print("Beginning scrape")
+    print("\033[95m\033[1mBeginning class data fetching...\033[0m")
     result = scrape_schedules()
     semesters = get_semester_ids()
     
@@ -57,7 +57,7 @@ def startup():
             semester_courses[str(course.crn)] = course
         classes[semester] = semester_courses
 
-    print("Scrape done")
+    print("\033[95m\033[1mData fetching complete\033[0m")
 
 app.add_event_handler("startup", startup)
 
