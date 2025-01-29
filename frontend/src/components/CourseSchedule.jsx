@@ -3,12 +3,41 @@ import React, {useState} from 'react';
 function CourseSchedule({courses, onDeleteCourse}) {
     const [reviewOpen, setReviewOpen] = useState(false);
 
+    const courseData = []
+    courses.map(course => courseData.push(
+        [course.crn, course.course, course.instructor, course.location, course.time, course.days, "TBD"]
+    ));
+
     const handleReview = () => {
         setReviewOpen(true);
     };
 
     const closeReview = () => {
         setReviewOpen(false);
+    }
+
+    const exportCSV = ({ data, filename }) => {
+        const rows = [];
+        const title = ["CRN", "Course", "Instructor", "Location", "Time", "Days", "Exam Date"]
+
+        rows.push(title.join(','));
+        data.forEach(row => {
+            rows.push(row.join(','))
+        });
+
+        const csvString = rows.join('\n');
+
+        const blob = new Blob([csvString], {type: 'text/csv'});
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.style.display = 'none';
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
     }
 
     return (
@@ -91,7 +120,8 @@ function CourseSchedule({courses, onDeleteCourse}) {
                                 Close
                         </button>
                         <button 
-                            className="mt-3 mx-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-800">
+                            className="mt-3 mx-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-800"
+                            onClick={() => exportCSV({data: courseData, filename: "final_schedule.csv"})}>
                                 Export to CSV
                         </button>
                         {/* TODO: Make CSV export */}
