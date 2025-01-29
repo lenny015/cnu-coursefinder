@@ -3,9 +3,14 @@ import React, {useState} from 'react';
 function CourseSchedule({courses, onDeleteCourse}) {
     const [reviewOpen, setReviewOpen] = useState(false);
 
+    const fixName = (name) => {
+        const name_part = name.split(',').map(name_part => name_part.trim());
+        return `${name_part[1]} ${name_part[0]}`;
+    };
+
     const courseData = []
     courses.map(course => courseData.push(
-        [course.crn, course.course, course.instructor, course.location, course.time, course.days, "TBD"]
+        [course.crn, course.course, fixName(course.instructor), course.location, course.time, course.days, "TBD"]
     ));
 
     const handleReview = () => {
