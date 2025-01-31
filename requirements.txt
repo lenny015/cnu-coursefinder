@@ -4,3 +4,5 @@ uvicorn
 python-multipart
 requests
 bs4
+python-dotenv
+asyncpg
