@@ -4,6 +4,7 @@ import csv
 from typing import Dict
 from middleware.middleware import add_middleware
 from src.data.scraper import scrape_schedules, get_semester_ids
+from src.data.database import (db_init)
 
 app = FastAPI()
 
