@@ -4,7 +4,11 @@ import csv
 from typing import Dict
 from middleware.middleware import add_middleware
 from src.data.scraper import scrape_schedules, get_semester_ids
-from src.data.database import (db_init, create_table, insert_courses)
+from src.data.database import (db_init,
+                               create_table, 
+                               insert_courses,
+                               create_semesters_table,
+                               insert_semester)
 
 app = FastAPI()
 
@@ -41,6 +45,11 @@ async def startup():
     
     for semester_id in semesters.keys():
         await create_table(conn, semester_id)
+        
+    await create_semesters_table(conn)
+    
+    for semester_id, semester_name in semesters.items():
+        await insert_semester(conn, semester_id, semester_name)
     
     for semester, courses in result.items():
         semester_courses = dict()
@@ -68,8 +77,6 @@ async def startup():
         
     await conn.close()
     print("\033[95m\033[1mData fetching complete\033[0m")
-
-app.add_event_handler("startup", startup)
 
 @app.post("/upload")
 async def upload_csv(file: UploadFile = File(...)):
@@ -121,7 +128,7 @@ def get_course_by_name(course_name: str = Query(), semester: str = Query()):
     
 
 @app.get("/all_courses/")
-def get_all_courses(semester: str = Query()):
+async def get_all_courses(semester: str = Query()):
     if semester and (semester not in classes):
         raise HTTPException(status_code=404, detail="Semester not found")
     

@@ -10,7 +10,7 @@ async def db_init():
     return await asyncpg.connect(DATABASE_URL)
 
 async def create_table(conn, semester_id):
-    await conn.execute(f'''
+    await conn.execute(f"""
         CREATE TABLE IF NOT EXISTS courses_{semester_id} (
             crn INTEGER PRIMARY KEY,
             course TEXT,
@@ -25,7 +25,23 @@ async def create_table(conn, semester_id):
             seats INTEGER,
             status TEXT
         )
-    ''')
+    """)
+    
+async def create_semesters_table(conn):
+    await conn.execute("""
+        CREATE TABLE IF NOT EXISTS semesters (
+            semester_id TEXT PRIMARY KEY,
+            semester_name TEXT
+        )
+    """)
+    
+async def insert_semester(conn, semester_id, semester_name):
+    await conn.execute("""
+        INSERT INTO semesters (semester_id, semester_name)
+        VALUES ($1, $2)
+        ON CONFLICT (semester_id) DO UPDATE
+        SET semester_name = $2
+    """, semester_id, semester_name)
     
 async def insert_courses(conn, semester_id, courses):
     values = []
