@@ -4,7 +4,7 @@ import csv
 from typing import Dict
 from middleware.middleware import add_middleware
 from src.data.scraper import scrape_schedules, get_semester_ids
-from src.data.database import (db_init)
+from src.data.database import (db_init, create_table, insert_courses)
 
 app = FastAPI()
 
@@ -27,7 +27,9 @@ class Course(BaseModel):
 classes: Dict[str, Dict[str, Course]] = {}
 semesters = dict()
 
-def startup():
+@app.on_event("startup")
+async def startup():
+    conn = await db_init()
     
     global classes
     global semesters
@@ -37,8 +39,12 @@ def startup():
     result = scrape_schedules()
     semesters = get_semester_ids()
     
+    for semester_id in semesters.keys():
+        await create_table(conn, semester_id)
+    
     for semester, courses in result.items():
         semester_courses = dict()
+        curr_semester = []
         for i in courses:
             course = Course(
                 crn = int(i[0]),
@@ -56,8 +62,11 @@ def startup():
                 )
             
             semester_courses[str(course.crn)] = course
+            curr_semester.append(course)
         classes[semester] = semester_courses
-
+        await insert_courses(conn, semester, curr_semester)
+        
+    await conn.close()
     print("\033[95m\033[1mData fetching complete\033[0m")
 
 app.add_event_handler("startup", startup)
