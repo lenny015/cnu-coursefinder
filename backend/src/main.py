@@ -31,10 +31,12 @@ class Course(BaseModel):
 
 classes: Dict[str, Dict[str, Course]] = {}
 semesters = dict()
+db_conn = None
 
 @app.on_event("startup")
 async def startup():
-    conn = await db_init()
+    global db_conn
+    db_conn = await db_init()
     
     global classes
     global semesters
@@ -45,12 +47,12 @@ async def startup():
     semesters = get_semester_ids()
     
     for semester_id in semesters.keys():
-        await create_table(conn, semester_id)
+        await create_table(db_conn, semester_id)
         
-    await create_semesters_table(conn)
+    await create_semesters_table(db_conn)
     
     for semester_id, semester_name in semesters.items():
-        await insert_semester(conn, semester_id, semester_name)
+        await insert_semester(db_conn, semester_id, semester_name)
     
     for semester, courses in result.items():
         semester_courses = dict()
@@ -74,10 +76,15 @@ async def startup():
             semester_courses[str(course.crn)] = course
             curr_semester.append(course)
         classes[semester] = semester_courses
-        await insert_courses(conn, semester, curr_semester)
+        await insert_courses(db_conn, semester, curr_semester)
         
-    await conn.close()
+    await db_conn.close()
     print("\033[95m\033[1mData fetching complete\033[0m")
+    
+@app.on_event("shutdown")
+async def shutdown():
+    global db_conn
+    await db_conn.close()
 
 @app.post("/upload")
 async def upload_csv(file: UploadFile = File(...)):
@@ -130,13 +137,12 @@ def get_course_by_name(course_name: str = Query(), semester: str = Query()):
 
 @app.get("/all_courses/")
 async def get_all_courses(semester: str = Query()):
-    conn = await db_init()
+    global db_conn
     if semester and (semester not in classes):
         raise HTTPException(status_code=404, detail="Semester not found")
     
-    courses = await select_all_courses(conn, semester)
-    await conn.close()  
-    
+    courses = await select_all_courses(db_conn, semester)
+
     return courses
     
 
