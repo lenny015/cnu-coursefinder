@@ -8,7 +8,8 @@ from src.data.database import (db_init,
                                create_table, 
                                insert_courses,
                                create_semesters_table,
-                               insert_semester)
+                               insert_semester,
+                               select_all_courses)
 
 app = FastAPI()
 
@@ -129,10 +130,15 @@ def get_course_by_name(course_name: str = Query(), semester: str = Query()):
 
 @app.get("/all_courses/")
 async def get_all_courses(semester: str = Query()):
+    conn = await db_init()
     if semester and (semester not in classes):
         raise HTTPException(status_code=404, detail="Semester not found")
     
-    return list(classes[semester].values())
+    courses = await select_all_courses(conn, semester)
+    await conn.close()  
+    
+    return courses
+    
 
 @app.get("/semesters/")
 def get_semesters():

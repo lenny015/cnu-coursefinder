@@ -82,3 +82,24 @@ async def insert_courses(conn, semester_id, courses):
             seats = EXCLUDED.seats,
             status = EXCLUDED.status
                            """, values)
+    
+async def select_all_courses(conn, semester_id):
+    classes = []
+    records = await conn.fetch(f"SELECT * FROM courses_{semester_id}")
+    
+    for i in records:
+        classes.append({
+            "crn": i["crn"],
+            "course": i["course"],
+            "title": i["title"],
+            "hours": i["hours"],
+            "area": i["area"],
+            "type_lecture": i["type_lecture"],
+            "days": i["days"],
+            "time": i["time"],
+            "location": i["location"],
+            "instructor": i["instructor"],
+            "seats": i["seats"],
+            "status": i["status"]
+        })
+    return classes
