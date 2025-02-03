@@ -103,3 +103,9 @@ async def select_all_courses(conn, semester_id):
             "status": i["status"]
         })
     return classes
+
+async def select_semesters(conn):
+    semester_fetch = await conn.fetch("SELECT * from semesters")
+    semesters = {row["semester_id"]: row["semester_name"] for row in semester_fetch}
+    
+    return semesters
