@@ -78,7 +78,6 @@ async def startup():
         classes[semester] = semester_courses
         await insert_courses(db_conn, semester, curr_semester)
         
-    await db_conn.close()
     print("\033[95m\033[1mData fetching complete\033[0m")
     
 @app.on_event("shutdown")
