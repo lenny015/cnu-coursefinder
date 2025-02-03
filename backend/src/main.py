@@ -34,6 +34,47 @@ classes: Dict[str, Dict[str, Course]] = {}
 semesters = dict()
 db_conn = None
 
+async def process_courses(conn):
+    classes.clear()
+        
+    print("\033[95m\033[1mBeginning class data fetching...\033[0m")
+    result = scrape_schedules()
+    semesters = get_semester_ids()
+    
+    for semester_id in semesters.keys():
+        await create_table(conn, semester_id)
+        
+    await create_semesters_table(conn)
+    
+    for semester_id, semester_name in semesters.items():
+        await insert_semester(conn, semester_id, semester_name)
+    
+    for semester, courses in result.items():
+        semester_courses = dict()
+        curr_semester = []
+        for i in courses:
+            course = Course(
+                crn = int(i[0]),
+                course = i[1],
+                title = i[3],
+                hours = i[4],
+                area = i[5],
+                type_lecture = i[6],
+                days = i[7],
+                time = i[8],
+                location = i[9],
+                instructor = i[10],
+                seats = int(i[11]),
+                status = i[12]
+                )
+            
+            semester_courses[str(course.crn)] = course
+            curr_semester.append(course)
+        classes[semester] = semester_courses
+        await insert_courses(conn, semester, curr_semester)
+        
+    print("\033[95m\033[1mData fetching complete\033[0m")
+
 @app.on_event("startup")
 async def startup():
     global classes
@@ -50,48 +91,14 @@ async def startup():
                                           """)
     
     if table_exists:
-        print("Tables found, using tables instead")
+        print("Tables found")
+        update_tables = input("Update tables? Type 'update' to update\n")
+        
+        if update_tables.upper() == 'UPDATE':
+            await process_courses(db_conn)
     
     else:
-        classes.clear()
-        
-        print("\033[95m\033[1mBeginning class data fetching...\033[0m")
-        result = scrape_schedules()
-        semesters = get_semester_ids()
-        
-        for semester_id in semesters.keys():
-            await create_table(db_conn, semester_id)
-            
-        await create_semesters_table(db_conn)
-        
-        for semester_id, semester_name in semesters.items():
-            await insert_semester(db_conn, semester_id, semester_name)
-        
-        for semester, courses in result.items():
-            semester_courses = dict()
-            curr_semester = []
-            for i in courses:
-                course = Course(
-                    crn = int(i[0]),
-                    course = i[1],
-                    title = i[3],
-                    hours = i[4],
-                    area = i[5],
-                    type_lecture = i[6],
-                    days = i[7],
-                    time = i[8],
-                    location = i[9],
-                    instructor = i[10],
-                    seats = int(i[11]),
-                    status = i[12]
-                    )
-                
-                semester_courses[str(course.crn)] = course
-                curr_semester.append(course)
-            classes[semester] = semester_courses
-            await insert_courses(db_conn, semester, curr_semester)
-            
-        print("\033[95m\033[1mData fetching complete\033[0m")
+        await process_courses(db_conn)
     
 @app.on_event("shutdown")
 async def shutdown():
