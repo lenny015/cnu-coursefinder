@@ -91,8 +91,8 @@ async def startup():
                                           """)
     
     if table_exists:
-        print("Tables found")
-        update_tables = input("Update tables? Type 'update' to update\n")
+        print("Tables found in database")
+        update_tables = input("Type 'update' to update tables, otherwise program will use existing tables:\n")
         
         if update_tables.upper() == 'UPDATE':
             await process_courses(db_conn)
