@@ -13,8 +13,9 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
   const handleCourses = (course) => {
     if (!courses.find((select) => select.crn === course.crn)) {
       const times = courses.map((c) => c.time);
+      const days = courses.map((c) => c.days);
 
-      if (!validTime(course.time, times)) {
+      if (!validTime(course.time, times, course.days, days)) {
         toast.error("Error: Class times overlap in schedule", {
           position: "bottom-right",
           autoClose: 3000,
@@ -50,14 +51,18 @@ function FilterClassTable({ classes, onSemesterChange, apiUrl }) {
     return {start, end};
   }
 
-  function validTime(newTime, setTimes) {
+  function validTime(newTime, setTimes, newDay, setDays) {
     const {start: newStart, end: newEnd} = parseTime(newTime);
 
+    let i = 0;
     for (const time of setTimes) {
       const {start, end} = parseTime(time);
       if (newStart < end && newEnd > start) {
-        return false;
+        if (setDays[i] === newDay) {
+          return false;
+        }
       }
+      i++;
     }
     return true;
   }
