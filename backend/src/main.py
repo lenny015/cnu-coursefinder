@@ -11,6 +11,7 @@ from src.data.database import (db_init,
                                insert_semester,
                                select_all_courses,
                                select_semesters)
+import asyncio
 
 app = FastAPI()
 
@@ -74,6 +75,12 @@ async def process_courses(conn):
         await insert_courses(conn, semester, curr_semester)
         
     print("\033[95m\033[1mData fetching complete\033[0m")
+    
+async def update_courses():
+    while True:
+        print("Updating courses")
+        await process_courses(db_conn)
+        await asyncio.sleep(3 * 60 * 60) # update every 3 hours
 
 @app.on_event("startup")
 async def startup():
@@ -99,6 +106,8 @@ async def startup():
     
     else:
         await process_courses(db_conn)
+        
+    asyncio.create_task(update_courses())
     
 @app.on_event("shutdown")
 async def shutdown():
