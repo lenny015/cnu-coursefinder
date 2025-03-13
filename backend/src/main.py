@@ -106,8 +106,6 @@ async def startup():
     
     else:
         await process_courses(db_conn)
-        
-    asyncio.create_task(update_courses())
     
 @app.on_event("shutdown")
 async def shutdown():
